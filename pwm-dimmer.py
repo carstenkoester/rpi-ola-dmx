@@ -23,23 +23,23 @@ IO.setwarnings(False)
 IO.setmode (IO.BCM)
 
 # Callback for new data
-def NewData(data):
+def new_data(data):
     intens = data[START-1]
     for (i, p) in enumerate(GPIO_PORTS):
-        print("Index {} addr {} gpio {} rvalue {} intens {} value {} cycle {}".format(
-            i, START+i, p, data[START+i], intens, intens*data[START+i]/255, intens*data[START+i]*100/255/255))
+#        print("Index {} addr {} gpio {} rvalue {} intens {} value {} cycle {}".format(
+#            i, START+i, p, data[START+i], intens, intens*data[START+i]/255, intens*data[START+i]*100/255/255))
         pwm[p].ChangeDutyCycle(intens * data[START+i] * 100 / 255 / 255)
 
 # Setup
-def init():
-    pwm = {}
+def init_pwm():
     for p in GPIO_PORTS:
         IO.setup(p, IO.OUT)
         pwm[p] = IO.PWM(p, 100)
         pwm[p].start(0)
 
-init()
+pwm = {}
+init_pwm()
 wrapper = ClientWrapper()
 client = wrapper.Client()
-client.RegisterUniverse(UNIVERSE, client.REGISTER, NewData)
+client.RegisterUniverse(UNIVERSE, client.REGISTER, new_data)
 wrapper.Run()
